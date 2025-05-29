@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white">
+
+        <!-- Jumbotron Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@drawable/bg_jumbotron"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/fakeLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DoJo Movie"
+                android:textColor="@android:color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed" />
+
+            <TextView
+                android:id="@+id/fakeTagline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Streaming • Bioskop • Musik"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Lokasi -->
+        <TextView
+            android:id="@+id/textViewLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lokasi: Jakarta, Indonesia"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="12dp"
+            android:textStyle="italic"/>
+
+        <!-- Google Map -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/mapFragmentContainer"
+            android:name="com.example.dojo_movie_2.fragment.MapsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Judul Daftar Film -->
+        <TextView
+            android:id="@+id/labelFilm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daftar Film"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/black" />
+
+        <!-- Daftar Film -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFilm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="true"/>
+
+    </LinearLayout>
+</ScrollView>
