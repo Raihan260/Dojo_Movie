@@ -62,4 +62,28 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
         return list
     }
+
+    fun insertUser(email: String, password: String): Boolean {
+        val db = writableDatabase
+        val cursor = db.rawQuery("SELECT * FROM users WHERE email=?", arrayOf(email))
+        if (cursor.count > 0) {
+            cursor.close()
+            return false
+        }
+        val values = ContentValues().apply {
+            put("email", email)
+            put("password", password)
+        }
+        val result = db.insert("users", null, values)
+        return result != -1L
+    }
+
+    fun checkUser(email: String, password: String): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM users WHERE email=? AND password=?", arrayOf(email, password))
+        val result = cursor.count > 0
+        cursor.close()
+        return result
+    }
+
 }

@@ -1,37 +1,30 @@
 package com.example.dojo_movie_2
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import com.example.dojo_movie_2.databinding.ActivityMainBinding
-import com.example.dojo_movie_2.fragment.HistoryFragment
-import com.example.dojo_movie_2.fragment.ProfileFragment
-import com.example.dojo_movie_2.fragment.HomeFragment
+import com.example.dojo_movie_2.fragment.auth.LoginFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var bottomNavigation: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
 
-        loadFragment(HomeFragment())
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+        bottomNavigation.visibility = View.GONE // disembunyikan di awal (belum login)
 
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> loadFragment(HomeFragment())
-                R.id.nav_history -> loadFragment(HistoryFragment())
-                R.id.nav_profile -> loadFragment(ProfileFragment())
-            }
-            true
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, LoginFragment())
+                .commit()
         }
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+    fun showBottomNav(show: Boolean) {
+        bottomNavigation.visibility = if (show) View.VISIBLE else View.GONE
     }
 }
