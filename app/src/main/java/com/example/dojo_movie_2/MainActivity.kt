@@ -1,30 +1,53 @@
 package com.example.dojo_movie_2
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.dojo_movie_2.fragment.auth.LoginFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.fragment.app.Fragment
+import com.example.dojo_movie_2.databinding.ActivityMainBinding
+import com.example.dojo_movie_2.fragment.HistoryFragment
+import com.example.dojo_movie_2.fragment.HomeFragment
+import com.example.dojo_movie_2.fragment.ProfileFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var bottomNavigation: BottomNavigationView
+    companion object {
+        const val PREFS_NAME = "user_session"
+        const val KEY_PHONE = "phone"
+    }
+
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-        bottomNavigation.visibility = View.GONE // disembunyikan di awal (belum login)
+        // Cek apakah user sudah login
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val phone = prefs.getString(KEY_PHONE, null)
+        if (phone == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, LoginFragment())
-                .commit()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        loadFragment(HomeFragment())
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> loadFragment(HomeFragment())
+                R.id.nav_history -> loadFragment(HistoryFragment())
+                R.id.nav_profile -> loadFragment(ProfileFragment())
+            }
+            true
         }
     }
 
-    fun showBottomNav(show: Boolean) {
-        bottomNavigation.visibility = if (show) View.VISIBLE else View.GONE
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 }

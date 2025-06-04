@@ -13,35 +13,51 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val DATABASE_VERSION = 1
 
         private const val TABLE_HISTORY = "history"
-        private const val COLUMN_ID = "id"
-        private const val COLUMN_TITLE = "title"
-        private const val COLUMN_PRICE = "price"
-        private const val COLUMN_QUANTITY = "quantity" // tambah kolom quantity
+        private const val HISTORY_COLUMN_ID = "id"
+        private const val HISTORY_COLUMN_TITLE = "title"
+        private const val HISTORY_COLUMN_PRICE = "price"
+        private const val HISTORY_COLUMN_QUANTITY = "quantity"
+
+        private const val TABLE_USERS = "users"
+        private const val USERS_COLUMN_ID = "id"
+        private const val USERS_COLUMN_PHONE = "phone"
+        private const val USERS_COLUMN_PASSWORD = "password"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         val createTableHistory = """
             CREATE TABLE $TABLE_HISTORY (
-                $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_TITLE TEXT,
-                $COLUMN_PRICE INTEGER,
-                $COLUMN_QUANTITY INTEGER
+                $HISTORY_COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $HISTORY_COLUMN_TITLE TEXT,
+                $HISTORY_COLUMN_PRICE INTEGER,
+                $HISTORY_COLUMN_QUANTITY INTEGER
             )
         """.trimIndent()
+
+        val createTableUsers = """
+            CREATE TABLE $TABLE_USERS (
+                $USERS_COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $USERS_COLUMN_PHONE TEXT UNIQUE,
+                $USERS_COLUMN_PASSWORD TEXT
+            )
+        """.trimIndent()
+
         db.execSQL(createTableHistory)
+        db.execSQL(createTableUsers)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_HISTORY")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
         onCreate(db)
     }
 
     fun insertHistory(history: HistoryModel): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
-            put(COLUMN_TITLE, history.title)
-            put(COLUMN_PRICE, history.price)
-            put(COLUMN_QUANTITY, history.quantity)
+            put(HISTORY_COLUMN_TITLE, history.title)
+            put(HISTORY_COLUMN_PRICE, history.price)
+            put(HISTORY_COLUMN_QUANTITY, history.quantity)
         }
         return db.insert(TABLE_HISTORY, null, values)
     }
@@ -49,13 +65,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getAllHistory(): List<HistoryModel> {
         val list = mutableListOf<HistoryModel>()
         val db = readableDatabase
-        val cursor = db.query(TABLE_HISTORY, null, null, null, null, null, "$COLUMN_ID DESC")
+        val cursor = db.query(TABLE_HISTORY, null, null, null, null, null, "$HISTORY_COLUMN_ID DESC")
         with(cursor) {
             while (moveToNext()) {
-                val id = getInt(getColumnIndexOrThrow(COLUMN_ID))
-                val title = getString(getColumnIndexOrThrow(COLUMN_TITLE))
-                val price = getInt(getColumnIndexOrThrow(COLUMN_PRICE))
-                val quantity = getInt(getColumnIndexOrThrow(COLUMN_QUANTITY))
+                val id = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_ID))
+                val title = getString(getColumnIndexOrThrow(HISTORY_COLUMN_TITLE))
+                val price = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_PRICE))
+                val quantity = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_QUANTITY))
                 list.add(HistoryModel(id, title, price, quantity))
             }
             close()
@@ -63,27 +79,33 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return list
     }
 
-    fun insertUser(email: String, password: String): Boolean {
-        val db = writableDatabase
-        val cursor = db.rawQuery("SELECT * FROM users WHERE email=?", arrayOf(email))
-        if (cursor.count > 0) {
-            cursor.close()
-            return false
-        }
-        val values = ContentValues().apply {
-            put("email", email)
-            put("password", password)
-        }
-        val result = db.insert("users", null, values)
-        return result != -1L
+    fun isPhoneExists(phone: String): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_USERS WHERE $USERS_COLUMN_PHONE = ?", arrayOf(phone))
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        return exists
     }
 
-    fun checkUser(email: String, password: String): Boolean {
+    fun checkUser(phone: String, password: String): Boolean {
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM users WHERE email=? AND password=?", arrayOf(email, password))
-        val result = cursor.count > 0
+        val cursor = db.rawQuery(
+            "SELECT * FROM $TABLE_USERS WHERE $USERS_COLUMN_PHONE = ? AND $USERS_COLUMN_PASSWORD = ?",
+            arrayOf(phone, password)
+        )
+        val exists = cursor.moveToFirst()
         cursor.close()
-        return result
+        return exists
+    }
+
+    fun addUser(phone: String, password: String): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(USERS_COLUMN_PHONE, phone)
+            put(USERS_COLUMN_PASSWORD, password)
+        }
+        val result = db.insert(TABLE_USERS, null, values)
+        return result != -1L
     }
 
 }
