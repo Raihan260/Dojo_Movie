@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@android:color/white">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -25,7 +26,6 @@
             android:layout_height="250dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher_background" />
-
 
         <TextView
             android:id="@+id/tvDetailTitle"
@@ -61,20 +61,14 @@
             android:layout_marginTop="8dp"
             android:textStyle="bold" />
 
-
         <Button
             android:id="@+id/btnBeli"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Beli Film"
             android:layout_marginTop="24dp"
-            android:backgroundTint="@color/black"
-
-            />
-
+            android:backgroundTint="@color/black" />
 
     </LinearLayout>
 
 </ScrollView>
-
-
