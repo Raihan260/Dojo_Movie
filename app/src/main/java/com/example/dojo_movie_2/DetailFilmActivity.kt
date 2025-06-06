@@ -27,6 +27,10 @@ class DetailFilmActivity : AppCompatActivity() {
         val btnBeli: Button = findViewById(R.id.btnBeli)
         val btnBack: ImageButton = findViewById(R.id.btnBack)
 
+        val sharedPrefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE)
+        val userPhone = sharedPrefs.getString(MainActivity.KEY_PHONE, "") ?: ""
+
+
         val db = DatabaseHelper(this)
 
         tvTitle.text = title
@@ -74,12 +78,12 @@ class DetailFilmActivity : AppCompatActivity() {
             }
 
             val result = db.insertHistory(
-                HistoryModel(
-                    title = title,            // judul film
-                    price = price * quantity, // total harga
-                    quantity = quantity       // jumlah tiket
-
-                )
+                history = HistoryModel(
+                    title = title,
+                    price = price * quantity,
+                    quantity = quantity
+                ),
+                userPhone = userPhone // ini penting!
             )
 
             if (result != -1L) {

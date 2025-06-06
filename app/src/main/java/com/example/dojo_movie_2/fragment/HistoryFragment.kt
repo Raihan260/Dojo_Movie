@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dojo_movie_2.MainActivity
 import com.example.dojo_movie_2.R
 import com.example.dojo_movie_2.adapter.HistoryAdapter
 import com.example.dojo_movie_2.db.DatabaseHelper
@@ -25,10 +28,19 @@ class HistoryFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val db = DatabaseHelper(requireContext())
-        val data = db.getAllHistory()
-        historyAdapter = HistoryAdapter(data)
-        recyclerView.adapter = historyAdapter
+        val prefs = requireActivity().getSharedPreferences(MainActivity.PREFS_NAME, AppCompatActivity.MODE_PRIVATE)
+        val phone = prefs.getString(MainActivity.KEY_PHONE, null)
+
+        if (!phone.isNullOrEmpty()) {
+            val data = db.getHistoryByUser(phone)
+            historyAdapter = HistoryAdapter(data)
+            recyclerView.adapter = historyAdapter
+        } else {
+            Toast.makeText(requireContext(), "Nomor telepon tidak ditemukan di sesi", Toast.LENGTH_SHORT).show()
+        }
 
         return view
     }
+
+
 }

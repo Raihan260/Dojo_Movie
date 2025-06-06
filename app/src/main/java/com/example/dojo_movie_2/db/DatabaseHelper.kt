@@ -12,6 +12,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val DATABASE_NAME = "DojoMovie.db"
         private const val DATABASE_VERSION = 1
 
+        private const val HISTORY_COLUMN_USER_PHONE = "user_phone"
+
         private const val TABLE_HISTORY = "history"
         private const val HISTORY_COLUMN_ID = "id"
         private const val HISTORY_COLUMN_TITLE = "title"
@@ -30,7 +32,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $HISTORY_COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $HISTORY_COLUMN_TITLE TEXT,
                 $HISTORY_COLUMN_PRICE INTEGER,
-                $HISTORY_COLUMN_QUANTITY INTEGER
+                $HISTORY_COLUMN_QUANTITY INTEGER,
+                user_phone TEXT
             )
         """.trimIndent()
 
@@ -52,14 +55,40 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
 
-    fun insertHistory(history: HistoryModel): Long {
+    fun insertHistory(history: HistoryModel, userPhone: String): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
             put(HISTORY_COLUMN_TITLE, history.title)
             put(HISTORY_COLUMN_PRICE, history.price)
             put(HISTORY_COLUMN_QUANTITY, history.quantity)
+            put(HISTORY_COLUMN_USER_PHONE, userPhone)
         }
         return db.insert(TABLE_HISTORY, null, values)
+    }
+
+    fun getHistoryByUser(phone: String): List<HistoryModel> {
+        val list = mutableListOf<HistoryModel>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_HISTORY,
+            null,
+            "$HISTORY_COLUMN_USER_PHONE = ?",
+            arrayOf(phone),
+            null,
+            null,
+            "$HISTORY_COLUMN_ID DESC"
+        )
+        with(cursor) {
+            while (moveToNext()) {
+                val id = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_ID))
+                val title = getString(getColumnIndexOrThrow(HISTORY_COLUMN_TITLE))
+                val price = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_PRICE))
+                val quantity = getInt(getColumnIndexOrThrow(HISTORY_COLUMN_QUANTITY))
+                list.add(HistoryModel(id, title, price, quantity))
+            }
+            close()
+        }
+        return list
     }
 
     fun getAllHistory(): List<HistoryModel> {
