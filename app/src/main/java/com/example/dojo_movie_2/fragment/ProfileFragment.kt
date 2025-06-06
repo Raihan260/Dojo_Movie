@@ -30,14 +30,24 @@ class ProfileFragment : Fragment() {
         tvName.text = "Halo, $phone!"
 
         btnLogout.setOnClickListener {
-            // Hapus session
-            prefs.edit().clear().apply()
+            // Tampilkan dialog konfirmasi
+            val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            builder.setTitle("Konfirmasi Logout")
+            builder.setMessage("Apakah Anda yakin ingin logout?")
+            builder.setPositiveButton("Ya") { _, _ ->
+                // Hapus session
+                prefs.edit().clear().apply()
 
-            // Pindah ke LoginActivity, clear back stack supaya tidak bisa back ke MainActivity
-            val intent = Intent(activity, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            activity?.finish()
+                // Pindah ke LoginActivity, clear back stack
+                val intent = Intent(activity, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                activity?.finish()
+            }
+            builder.setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            builder.show()
         }
 
         return view
