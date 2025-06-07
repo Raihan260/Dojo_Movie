@@ -40,7 +40,6 @@ class OtpActivity : AppCompatActivity() {
                 Toast.makeText(this, "Invalid OTP Code", Toast.LENGTH_SHORT).show()
             } else {
                 db.addUser(phone, password)
-                // Tambahkan setelah db.addUser(phone, password)
                 val prefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE)
                 prefs.edit().putString(MainActivity.KEY_PHONE, phone).apply()
                 Toast.makeText(this, "User registered successfully", Toast.LENGTH_SHORT).show()
